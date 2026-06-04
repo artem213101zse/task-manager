@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Мои задачи — Менеджер задач{% endblock %}
+
+{% block content %}
+<div class="flex items-end justify-between mb-6">
+    <div>
+        <h1 class="text-3xl font-semibold tracking-tight">Мои задачи</h1>
+        <p class="text-slate-500 mt-1">Всего: {{ page_obj.paginator.count }} • Фильтры и поиск ниже</p>
+    </div>
+    <a href="{% url 'tasks:task-create' %}" 
+       class="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-2xl hover:bg-blue-700 transition">
+        + Создать задачу
+    </a>
+</div>
+
+<!-- Filters -->
+<form method="get" class="bg-white border border-slate-100 rounded-3xl p-4 mb-6 flex flex-col sm:flex-row flex-wrap gap-3 items-end">
+    <div class="flex-1 min-w-[180px]">
+        <label class="text-xs font-medium text-slate-500 block mb-1">Поиск по названию</label>
+        <input type="text" name="q" value="{{ current_q }}" placeholder="Например: отчёт"
+               class="w-full border border-slate-200 rounded-2xl px-4 py-2 text-sm focus:border-blue-500 outline-none">
+    </div>
+
+    <div>
+        <label class="text-xs font-medium text-slate-500 block mb-1">Статус</label>
+        <select name="status" class="border border-slate-200 rounded-2xl px-3 py-2 text-sm min-w-[150px]">
+            <option value="">Все</option>
+            {% for value, label in status_choices %}
+                <option value="{{ value }}" {% if current_status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div>
+        <label class="text-xs font-medium text-slate-500 block mb-1">Приоритет</label>
+        <select name="priority" class="border border-slate-200 rounded-2xl px-3 py-2 text-sm min-w-[150px]">
+            <option value="">Все</option>
+            {% for value, label in priority_choices %}
+                <option value="{{ value }}" {% if current_priority == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="flex gap-2">
+        <button type="submit" class="px-5 py-2 bg-slate-900 text-white rounded-2xl text-sm font-medium">Применить</button>
+        <a href="{% url 'tasks:task-list' %}" class="px-4 py-2 border border-slate-200 rounded-2xl text-sm hover:bg-slate-50">Сбросить</a>
+    </div>
+</form>
+
+<!-- Tasks Grid -->
+{% if tasks %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for task in tasks %}
+    <div class="task-card bg-white border border-slate-100 rounded-3xl p-5 flex flex-col">
+        <div class="flex items-start justify-between gap-3">
+            <h3 class="font-semibold text-lg leading-tight pr-2">{{ task.title }}</h3>
+            <div class="flex flex-col items-end gap-1 shrink-0">
+                <span class="badge status-{{ task.status }}">{{ task.get_status_display }}</span>
+                <span class="badge priority-{{ task.priority }}">{{ task.get_priority_display }}</span>
+            </div>
+        </div>
+
+        {% if task.description %}
+        <p class="mt-3 text-sm text-slate-600 line-clamp-3">{{ task.description }}</p>
+        {% endif %}
+
+        <div class="mt-auto pt-4 flex items-center justify-between text-xs">
+            <div>
+                {% if task.due_date %}
+                    <span class="{% if task.is_overdue %}text-red-600 font-medium{% else %}text-slate-500{% endif %}">
+                        Срок: {{ task.due_date|date:"d M Y" }}
+                        {% if task.is_overdue %} • просрочена{% endif %}
+                    </span>
+                {% else %}
+                    <span class="text-slate-400">Без срока</span>
+                {% endif %}
+            </div>
+            <div class="text-slate-400">{{ task.created_at|date:"d M" }}</div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-slate-100 flex gap-2">
+            <a href="{% url 'tasks:task-edit' task.pk %}" 
+               class="flex-1 text-center text-sm px-4 py-2 border border-slate-200 rounded-2xl hover:bg-slate-50 transition">Редактировать</a>
+            <a href="{% url 'tasks:task-delete' task.pk %}" 
+               class="flex-1 text-center text-sm px-4 py-2 border border-red-200 text-red-600 rounded-2xl hover:bg-red-50 transition">Удалить</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if is_paginated %}
+<div class="mt-8 flex justify-center gap-1 text-sm">
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_priority %}&priority={{ current_priority }}{% endif %}{% if current_q %}&q={{ current_q }}{% endif %}" 
+           class="px-3 py-1.5 border rounded-2xl hover:bg-white">← Назад</a>
+    {% endif %}
+    <span class="px-4 py-1.5 text-slate-500">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if current_status %}&status={{ current_status }}{% endif %}{% if current_priority %}&priority={{ current_priority }}{% endif %}{% if current_q %}&q={{ current_q }}{% endif %}" 
+           class="px-3 py-1.5 border rounded-2xl hover:bg-white">Вперёд →</a>
+    {% endif %}
+</div>
+{% endif %}
+
+{% else %}
+<div class="bg-white rounded-3xl border border-dashed border-slate-200 py-14 text-center">
+    <div class="text-5xl mb-3">📭</div>
+    <div class="font-medium">Задач пока нет</div>
+    <p class="text-sm text-slate-500 mt-1">Создайте первую задачу или измените фильтры</p>
+    <a href="{% url 'tasks:task-create' %}" class="mt-4 inline-block px-5 py-2 bg-blue-600 text-white text-sm rounded-2xl">+ Новая задача</a>
+</div>
+{% endif %}
+{% endblock %}

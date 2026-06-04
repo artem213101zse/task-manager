@@ -1,0 +1,31 @@
+# Auto detect text files and normalize to LF on commit
+* text=auto
+
+# Explicitly declare file types
+*.sh text eol=lf
+*.py text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+Dockerfile text eol=lf
+docker-compose*.yml text eol=lf
+entrypoint.sh text eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar.gz binary
+
+# Windows specific (keep CRLF if needed, but we prefer LF)
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf

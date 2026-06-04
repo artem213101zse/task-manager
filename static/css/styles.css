@@ -1,0 +1,98 @@
+/* Custom styles for Task Manager - loaded via static files */
+
+:root {
+  --accent: #2563eb;
+}
+
+/* Form field improvements (in addition to Tailwind) */
+input[type="text"],
+input[type="password"],
+input[type="date"],
+textarea,
+select {
+  transition: all 0.15s ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Nice badge styles (used on task cards) */
+.badge {
+  font-size: 0.75rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.status-todo { background-color: #fef3c7; color: #92400e; }
+.status-in_progress { background-color: #dbeafe; color: #1e40af; }
+.status-done { background-color: #d1fae5; color: #065f46; }
+
+.priority-low { background-color: #f3e8ff; color: #6b21a8; }
+.priority-medium { background-color: #ffedd5; color: #9a3412; }
+.priority-high { background-color: #fee2e2; color: #991b1b; }
+
+/* Task card hover polish */
+.task-card {
+  transition: transform 0.2s cubic-bezier(0.4, 0.0, 0.2, 1), 
+              box-shadow 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Mobile improvements */
+@media (max-width: 640px) {
+  .task-card {
+    padding: 1rem;
+  }
+  
+  /* Make buttons and links more touch-friendly */
+  .nav-link, button {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Custom empty state */
+.empty-state {
+  background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+/* Subtle animation for new tasks / messages */
+.message {
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Better select and date input on mobile */
+select, input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Navbar mobile menu */
+#mobile-menu {
+  display: none;
+}
+
+#mobile-menu.open {
+  display: block;
+}
+
+/* Footer polish */
+footer {
+  font-feature-settings: "tnum";
+}

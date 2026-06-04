@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Менеджер задач{% endblock %}</title>
+    
+    <!-- Tailwind via CDN (for rapid development) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom static CSS (collected and served by Nginx in production) -->
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    
+    <script>
+        function initTailwind() {
+            document.documentElement.style.setProperty('--accent', '#2563eb');
+        }
+        window.onload = initTailwind;
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <a href="/" class="flex items-center gap-2 font-semibold text-xl tracking-tight text-slate-900">
+                    <span class="inline-block w-8 h-8 bg-blue-600 text-white rounded-xl flex items-center justify-center text-sm font-bold">TM</span>
+                    <span class="hidden sm:inline">Менеджер задач</span>
+                    <span class="sm:hidden">Задачи</span>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center gap-2 text-sm">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'tasks:task-list' %}" 
+                           class="px-3 py-1.5 rounded-xl hover:bg-slate-100 transition {% if request.resolver_match.url_name == 'task-list' %}bg-slate-100 font-medium{% endif %}">
+                            Мои задачи
+                        </a>
+                        <a href="{% url 'tasks:task-create' %}" 
+                           class="px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-sm font-medium transition flex items-center gap-1">
+                            <span>+</span> <span>Новая задача</span>
+                        </a>
+                        
+                        {% if user.is_staff %}
+                        <a href="/admin/" target="_blank"
+                           class="px-3 py-1.5 rounded-xl hover:bg-slate-100 transition text-slate-600">Админ</a>
+                        {% endif %}
+
+                        <div class="ml-2 pl-3 border-l border-slate-200 flex items-center gap-2">
+                            <span class="text-slate-600 text-sm">Привет, <strong>{{ user.username }}</strong></span>
+                            <form action="{% url 'logout' %}" method="post" class="inline">
+                                {% csrf_token %}
+                                <button type="submit"
+                                        class="text-red-600 hover:text-red-700 px-3 py-1 rounded-xl hover:bg-red-50 transition text-sm bg-transparent border-0 cursor-pointer">
+                                    Выйти
+                                </button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="px-4 py-1.5 text-slate-600 hover:text-slate-900 font-medium">Войти</a>
+                        <a href="{% url 'tasks:register' %}" 
+                           class="px-4 py-1.5 bg-slate-900 hover:bg-black text-white rounded-2xl text-sm font-medium transition">Регистрация</a>
+                    {% endif %}
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn"
+                            aria-expanded="false"
+                            class="px-3 py-2 rounded-xl hover:bg-slate-100 text-slate-600 transition flex items-center justify-center w-10 h-10 text-lg"
+                            aria-label="Открыть меню">
+                        <span class="text-xl">☰</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Navigation Menu -->
+            <div id="mobile-menu" class="md:hidden border-t border-slate-100 py-3">
+                {% if user.is_authenticated %}
+                    <div class="flex flex-col gap-1 text-sm">
+                        <a href="{% url 'tasks:task-list' %}" 
+                           class="px-4 py-2.5 rounded-2xl hover:bg-slate-100 transition {% if request.resolver_match.url_name == 'task-list' %}bg-slate-100 font-medium{% endif %}">
+                            Мои задачи
+                        </a>
+                        <a href="{% url 'tasks:task-create' %}" 
+                           class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl text-sm font-medium transition flex items-center gap-2">
+                            <span>+</span> <span>Новая задача</span>
+                        </a>
+                        
+                        {% if user.is_staff %}
+                        <a href="/admin/" target="_blank"
+                           class="px-4 py-2.5 rounded-2xl hover:bg-slate-100 transition text-slate-600">Админ-панель</a>
+                        {% endif %}
+
+                        <div class="px-4 py-2 border-t border-slate-100 mt-1 flex items-center justify-between">
+                            <span class="text-slate-600 text-sm">Привет, <strong>{{ user.username }}</strong></span>
+                            <form action="{% url 'logout' %}" method="post" class="inline">
+                                {% csrf_token %}
+                                <button type="submit"
+                                        class="text-red-600 hover:text-red-700 px-3 py-1 rounded-xl hover:bg-red-50 transition text-sm bg-transparent border-0 cursor-pointer font-medium">
+                                    Выйти
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="flex flex-col gap-1 px-1">
+                        <a href="{% url 'login' %}" class="px-4 py-2.5 text-slate-600 hover:bg-slate-100 rounded-2xl transition">Войти</a>
+                        <a href="{% url 'tasks:register' %}" 
+                           class="px-4 py-2.5 bg-slate-900 hover:bg-black text-white rounded-2xl text-sm font-medium transition text-center">Регистрация</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        {% if messages %}
+            <div class="mb-6 space-y-2">
+                {% for message in messages %}
+                    <div class="px-4 py-3 rounded-2xl text-sm flex items-start gap-3
+                        {% if message.tags == 'success' %}bg-emerald-100 text-emerald-800{% elif message.tags == 'error' %}bg-red-100 text-red-800{% else %}bg-blue-100 text-blue-800{% endif %}">
+                        <div class="flex-1">{{ message }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="border-t border-slate-200 mt-12 py-6 text-center text-xs text-slate-500">
+        Простой production-ready менеджер задач • Django + Docker + Nginx • 2026
+    </footer>
+
+    <!-- Custom JavaScript (static file) -->
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

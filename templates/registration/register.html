@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Регистрация — Менеджер задач{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-12">
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+        <div class="text-center mb-8">
+            <div class="mx-auto w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mb-4">TM</div>
+            <h1 class="text-2xl font-semibold tracking-tight">Создать аккаунт</h1>
+            <p class="text-slate-500 mt-1 text-sm">Начните управлять задачами бесплатно</p>
+        </div>
+
+        <form method="post" class="space-y-5">
+            {% csrf_token %}
+
+            {% if form.errors %}
+                <div class="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-2xl">
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}{{ error }}{% endfor %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1.5">Имя пользователя</label>
+                {{ form.username }}
+            </div>
+
+            <div class="grid grid-cols-1 gap-5">
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Пароль</label>
+                    {{ form.password1 }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-1.5">Повторите пароль</label>
+                    {{ form.password2 }}
+                </div>
+            </div>
+
+            <button type="submit"
+                    class="w-full mt-2 py-3 bg-slate-900 hover:bg-black active:bg-slate-950 transition text-white rounded-2xl font-semibold text-sm">
+                Зарегистрироваться
+            </button>
+        </form>
+
+        <div class="mt-6 text-center text-sm">
+            Уже есть аккаунт? 
+            <a href="{% url 'login' %}" class="font-medium text-blue-600 hover:text-blue-700">Войти</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
