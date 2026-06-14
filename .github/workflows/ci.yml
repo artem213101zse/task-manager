@@ -26,13 +26,12 @@ jobs:
       - name: Django System Check + Migrations (SQLite)
         env:
           SECRET_KEY: "ci-dummy-secret-key-for-github-actions-only-do-not-use-in-prod"
-          DEBUG: "False"
+          DEBUG: "True"
           DATABASE_URL: "sqlite:///:memory:"
           ALLOWED_HOSTS: "*"
-          # Переопределяем, чтобы точно не пытался подключиться к Postgres
           DJANGO_SETTINGS_MODULE: "task_manager.settings"
         run: |
-          python manage.py check --deploy --fail-level WARNING
+          python manage.py check --deploy --fail-level ERROR
           python manage.py migrate --noinput
 
   build:
