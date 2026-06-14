@@ -23,18 +23,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Django check + migrate (sqlite for CI)
+      - name: Django System Check + Migrations (SQLite)
         env:
           SECRET_KEY: "ci-dummy-secret-key-for-github-actions-only-do-not-use-in-prod"
           DEBUG: "False"
           DATABASE_URL: "sqlite:///:memory:"
           ALLOWED_HOSTS: "*"
-          POSTGRES_DB: "ci"
-          POSTGRES_USER: "ci"
-          POSTGRES_PASSWORD: "ci"
-          POSTGRES_HOST: "127.0.0.1"
+          # Переопределяем, чтобы точно не пытался подключиться к Postgres
+          DJANGO_SETTINGS_MODULE: "task_manager.settings"
         run: |
-          python manage.py check --deploy
+          python manage.py check --deploy --fail-level WARNING
           python manage.py migrate --noinput
 
   build:
@@ -43,8 +41,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build Docker images
-        run: |
-          docker compose build --no-cache
+        run: docker compose build --no-cache
 
       - name: Show built images
         run: docker images | grep -E 'task|nginx|postgres'
