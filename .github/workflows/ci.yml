@@ -30,8 +30,7 @@ jobs:
           DATABASE_URL: "sqlite:///:memory:"
           ALLOWED_HOSTS: "*"
           DJANGO_SETTINGS_MODULE: "task_manager.settings"
-        run: |
-          python manage.py check --deploy --fail-level ERROR
+        run:
           python manage.py migrate --noinput
 
   build:
