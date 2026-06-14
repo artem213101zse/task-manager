@@ -25,15 +25,14 @@ jobs:
 
       - name: Django check + migrate (sqlite for CI)
         env:
-          SECRET_KEY: ci-dummy-secret-key-for-github-actions-only-do-not-use-in-prod
+          SECRET_KEY: "ci-dummy-secret-key-for-github-actions-only-do-not-use-in-prod"
           DEBUG: "False"
-          # Force sqlite for the check job (override in real project with test settings if needed)
-          DATABASE_URL: sqlite:///:memory:
-          POSTGRES_DB: ci
-          POSTGRES_USER: ci
-          POSTGRES_PASSWORD: ci
-          POSTGRES_HOST: 127.0.0.1
+          DATABASE_URL: "sqlite:///:memory:"
           ALLOWED_HOSTS: "*"
+          POSTGRES_DB: "ci"
+          POSTGRES_USER: "ci"
+          POSTGRES_PASSWORD: "ci"
+          POSTGRES_HOST: "127.0.0.1"
         run: |
           python manage.py check --deploy
           python manage.py migrate --noinput
@@ -43,9 +42,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build Docker images (no cache to verify)
+      - name: Build Docker images
         run: |
           docker compose build --no-cache
 
-      - name: Quick smoke (show images)
+      - name: Show built images
         run: docker images | grep -E 'task|nginx|postgres'
